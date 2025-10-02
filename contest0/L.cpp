@@ -2,6 +2,16 @@
 #include <iostream>
 #include <string>
 #include <vector>
+bool check(int32_t point, int32_t length)
+{
+  if (point == length)
+  {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 int main() {
   std::string str;
   std::string target;
@@ -15,31 +25,35 @@ int main() {
   int32_t low;
   int32_t high;
   int32_t mid;
-  int32_t ans;
+  int32_t j;
   low = 0;
   high = length;
-  ans = 0;
   while (low <= high) {
     mid = low + (high - low) / 2;
     std::vector<bool> removed(length, false);
     for (int32_t i = 0; i < mid; i++) {
       removed[order[i] - 1] = true;
     }
-    int32_t j;
+
     j = 0;
     for (int32_t i = 0; i < length && j < (int32_t)target.length(); i++) {
       if (!removed[i] && str[i] == target[j]) {
         j++;
       }
     }
-    if (j == (int32_t)target.length()) {
-      ans = mid;
+    if (check(j, (int32_t)target.length())) {
       low = mid + 1;
     }
     else {
       high = mid - 1;
     }
   }
-  std::cout << ans << std::endl;
+  if (check(j, (int32_t)target.length()))
+  {
+    std::cout << low << std::endl;
+  }
+  else {
+    std::cout << high << std::endl;
+  }
   return 0;
-}
+}}
