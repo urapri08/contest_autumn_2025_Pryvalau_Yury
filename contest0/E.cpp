@@ -1,6 +1,17 @@
 #include <stdint.h>
 #include <iostream>
 #include <vector>
+bool check(int32_t a, int32_t b)
+{
+  if (a >= b)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
 int main() {
   std::ios::sync_with_stdio(false);
   std::cin.tie(0);
@@ -23,15 +34,22 @@ int main() {
     int32_t low = 0;
     int32_t high = num - 1;
     int32_t point = num;
-    while (low <= high) {
-      int32_t mid = low + (high - low) / 2;
-      if (lista[mid] + xval >= listb[mid]) {
-        point = mid;
+    int32_t mid;
+    while (low < high) {
+      mid = low + (high - low) / 2;
+      if (check(lista[mid] + xval, listb[mid])) {
         high = mid - 1;
       }
       else {
         low = mid + 1;
       }
+    }
+    if (check(lista[low] + xval, listb[low]))
+    {
+      point = low;
+    }
+    else {
+      point = high + 1;
     }
     int32_t result;
     if (point == 0) {
