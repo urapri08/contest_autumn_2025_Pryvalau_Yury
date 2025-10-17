@@ -1,11 +1,20 @@
 ﻿#include <iostream>
 #include <vector>
+<<<<<<< Updated upstream
 #include <stdint.h>
 
 struct Seg {
   int32_t start;
   int32_t end;
   Seg(int32_t s, int32_t e) : start(s), end(e) {}
+=======
+#include <cstdint>
+
+struct Seg {
+  int_32t start;
+  int end;
+  Seg(int s, int e) : start(s), end(e) {}
+>>>>>>> Stashed changes
 };
 
 void MergeSegments(std::vector<Seg>& segs, int32_t left, int32_t mid, int32_t right) {
