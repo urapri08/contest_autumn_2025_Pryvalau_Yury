@@ -40,7 +40,7 @@ void MergeSegments(std::vector<Seg>& segs, int32_t left, int32_t mid, int32_t ri
 }
 
 void SortSegments(std::vector<Seg>& segs, int32_t left, int32_t right) {
-  if (left >= right) {
+  if (right - left <= 1) {
     return;
   }
   int32_t mid = left + (right - left) / 2;
@@ -80,9 +80,7 @@ int main() {
     std::cin >> start >> end;
     segs.push_back(Seg(start, end));
   }
-  if (n > 0) {
-    SortSegments(segs, 0, segs.size() - 1);
-  }
+  SortSegments(segs, 0, segs.size());
   std::vector<Seg> answer = MergeOverlapping(segs);
   std::cout << answer.size() << std::endl;
   for (int32_t i = 0; i < (int32_t)answer.size(); i++) {
