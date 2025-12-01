@@ -3,6 +3,8 @@
 #include <map>
 #include <vector>
 
+const int cReservingMultiplier = 4;
+
 struct Event {
   long long x;
   long long y1;
@@ -34,12 +36,11 @@ private:
   }
 
 public:
-  SegmentTree(const std::vector<long long>& coord) {
-    int n = coord.size() - 1;
-    cnt_.resize(4 * n);
-    len_.resize(4 * n);
-    y_ = coord;
-    Build(0, 0, n);
+  SegmentTree(const std::vector<long long>& coord)
+    : y_(coord),
+    cnt_(cReservingMultiplier* (coord.size() - 1)),
+    len_(cReservingMultiplier* (coord.size() - 1)) {
+    Build(0, 0, coord.size() - 1);
   }
   void Update(int v, int l, int r, int ql, int qr, int val) {
     if (ql >= r || qr <= l) {
