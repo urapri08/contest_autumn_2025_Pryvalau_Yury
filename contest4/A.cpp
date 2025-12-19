@@ -2,34 +2,35 @@
 #include <cstdint>
 #include <iostream>
 #include <vector>
+#include <optional>
 
-const int32_t cModValue = 1000000000;
+const int32_t cModValue = 1'000'000'000;
 
-struct TreeVale {
+struct TreeNode {
   int64_t key;
   int32_t height;
-  TreeVale* left;
-  TreeVale* right;
+  TreeNode* left;
+  TreeNode* right;
 
-  TreeVale(int64_t k) : key(k), height(1), left(nullptr), right(nullptr) {}
+  TreeNode(int64_t k) : key(k), height(1), left(nullptr), right(nullptr) {}
 };
 
 class AVLTree {
 private:
-  TreeVale* root_;
-  static int32_t GetHeight(TreeVale* node) {
+  TreeNode* root_;
+  static int32_t GetHeight(TreeNode* node) {
     if (node == nullptr) {
       return 0;
     }
     return node->height;
   }
-  static int32_t FixBalance(TreeVale* node) {
+  static int32_t FixBalance(TreeNode* node) {
     if (node == nullptr) {
       return 0;
     }
     return GetHeight(node->left) - GetHeight(node->right);
   }
-  static void FixHeight(TreeVale* node) {
+  static void FixHeight(TreeNode* node) {
     if (node == nullptr) {
       return;
     }
@@ -42,37 +43,37 @@ private:
       node->height = right_height + 1;
     }
   }
-  static TreeVale* RotateRight(TreeVale* y) {
+  static TreeNode* RotateRight(TreeNode* y) {
     if (y == nullptr) {
       return nullptr;
     }
-    TreeVale* x = y->left;
+    TreeNode* x = y->left;
     if (x == nullptr) {
       return y;
     }
-    TreeVale* t2 = x->right;
+    TreeNode* t2 = x->right;
     x->right = y;
     y->left = t2;
     FixHeight(y);
     FixHeight(x);
     return x;
   }
-  static TreeVale* RotateLeft(TreeVale* x) {
+  static TreeNode* RotateLeft(TreeNode* x) {
     if (x == nullptr) {
       return nullptr;
     }
-    TreeVale* y = x->right;
+    TreeNode* y = x->right;
     if (y == nullptr) {
       return x;
     }
-    TreeVale* t2 = y->left;
+    TreeNode* t2 = y->left;
     y->left = x;
     x->right = t2;
     FixHeight(x);
     FixHeight(y);
     return y;
   }
-  static TreeVale* BalanceNode(TreeVale* node) {
+  static TreeNode* BalanceNode(TreeNode* node) {
     if (node == nullptr) {
       return node;
     }
@@ -92,9 +93,9 @@ private:
     }
     return node;
   }
-  static TreeVale* InsertNew(TreeVale* node, int64_t key) {
+  static TreeNode* InsertNew(TreeNode* node, int64_t key) {
     if (node == nullptr) {
-      return new TreeVale(key);
+      return new TreeNode(key);
     }
     if (key < node->key) {
       node->left = InsertNew(node->left, key);
@@ -107,20 +108,22 @@ private:
     }
     return BalanceNode(node);
   }
-  static int64_t FindLowerBound(TreeVale* node, int64_t key) {
+
+  static std::optional<int64_t> FindLowerBound(TreeNode* node, int64_t key) {
     if (node == nullptr) {
-      return -1;
+      return std::nullopt;
     }
     if (node->key < key) {
       return FindLowerBound(node->right, key);
     }
-    int64_t left_res = FindLowerBound(node->left, key);
-    if (left_res != -1) {
+    auto left_res = FindLowerBound(node->left, key);
+    if (left_res.has_value()) {
       return left_res;
     }
     return node->key;
   }
-  static void ClearTree(TreeVale* node) {
+
+  static void ClearTree(TreeNode* node) {
     if (node == nullptr) {
       return;
     }
@@ -133,7 +136,10 @@ public:
   AVLTree() : root_(nullptr) {}
   ~AVLTree() { ClearTree(root_); }
   void Insert(int64_t key) { root_ = InsertNew(root_, key); }
-  int64_t LowerBound(int64_t key) { return FindLowerBound(root_, key); }
+
+  std::optional<int64_t> LowerBound(int64_t key) {
+    return FindLowerBound(root_, key);
+  }
 };
 
 int main() {
@@ -159,7 +165,8 @@ int main() {
         prev_q = false;
       }
       else {
-        last = avl_tree.LowerBound(value);
+        auto result = avl_tree.LowerBound(value);
+        last = result.value_or(-1);
         std::cout << last << "\n";
         prev_q = true;
       }
