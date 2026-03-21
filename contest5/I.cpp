@@ -1,129 +1,74 @@
 ﻿#include <iostream>
 #include <string>
-const int cMaxN = 1005;
-const int cMaxK = 25;
-const int cInf = 10000;
-int dp[cMaxN][cMaxN][cMaxK];
-std::string global_u;
-std::string global_v;
-int global_n;
-int global_m;
-int global_k;
-void InitDP() {
-  int i;
-  i = 0;
-  while (i <= global_n) {
-    int j;
-    j = 0;
-    while (j <= global_m) {
-      int d;
-      d = 0;
-      while (d <= global_k) {
-        dp[i][j][d] = cInf;
-        d++;
-      }
-      j++;
-    }
-    i++;
-  }
-  dp[0][0][0] = 0;
-}
-void ProcessInsert(int i, int j, int d, int val) {
-  if (i < global_n) {
-    if (d + 1 <= global_k) {
-      if (val < dp[i + 1][j][d + 1]) {
-        dp[i + 1][j][d + 1] = val;
-      }
-    }
-  }
-}
-void ProcessDelete(int i, int j, int d, int val) {
-  if (j < global_m) {
-    if (d + 1 <= global_k) {
-      if (val < dp[i][j + 1][d + 1]) {
-        dp[i][j + 1][d + 1] = val;
-      }
-    }
-  }
-}
-void ProcessMatchSub(int i, int j, int d, int val) {
-  if (i < global_n) {
-    if (j < global_m) {
-      if (d + 1 <= global_k) {
-        if (val < dp[i + 1][j + 1][d + 1]) {
-          dp[i + 1][j + 1][d + 1] = val;
-        }
-      }
-      int cost;
-      cost = 1;
-      if (global_v[i] == global_u[j]) {
-        cost = 0;
-      }
-      if (val + cost < dp[i + 1][j + 1][d]) {
-        dp[i + 1][j + 1][d] = val + cost;
-      }
-    }
-  }
-}
-void ProcessState(int i, int j, int d) {
-  int val;
-  val = dp[i][j][d];
-  if (val == cInf) {
-    return;
-  }
-  ProcessInsert(i, j, d, val);
-  ProcessDelete(i, j, d, val);
-  ProcessMatchSub(i, j, d, val);
-}
-void RunDP() {
-  int i;
-  i = 0;
-  while (i <= global_n) {
-    int j;
-    j = 0;
-    while (j <= global_m) {
-      int d;
-      d = 0;
-      while (d <= global_k) {
-        ProcessState(i, j, d);
-        d++;
-      }
-      j++;
-    }
-    i++;
-  }
-}
-void PrintAnswer() {
-  int ans;
-  ans = cInf;
-  int d;
-  d = 0;
-  while (d <= global_k) {
-    if (dp[global_n][global_m][d] < ans) {
-      ans = dp[global_n][global_m][d];
-    }
-    d++;
-  }
-  if (ans == cInf) {
-    std::cout << -1 << "\n";
-  }
-  else {
-    std::cout << ans << "\n";
-  }
-}
-void Solve() {
-  std::cin >> global_u;
-  std::cin >> global_v;
-  std::cin >> global_k;
-  global_m = (int)global_u.length();
-  global_n = (int)global_v.length();
-  InitDP();
-  RunDP();
-  PrintAnswer();
-}
+#include <vector>
+const int cZero = 0;
+const int cOne = 1;
+const int cMinusOne = -1;
+const int cInf = 10'000;
 int main() {
   std::ios::sync_with_stdio(false);
   std::cin.tie(nullptr);
-  Solve();
-  return 0;
+  std::string u;
+  std::cin >> u;
+  std::string v;
+  std::cin >> v;
+  int k = cZero;
+  std::cin >> k;
+  int m = (int)u.length();
+  int n = (int)v.length();
+  std::vector<std::vector<std::vector<int>>> dp(n + cOne, std::vector<std::vector<int>>(m + cOne, std::vector<int>(k + cOne, cInf)));
+  dp[cZero][cZero][cZero] = cZero;
+  for (int i = cZero; i <= n; i++) {
+    for (int j = cZero; j <= m; j++) {
+      for (int d = cZero; d <= k; d++) {
+        int val = dp[i][j][d];
+        if (val == cInf) {
+          continue;
+        }
+        if (i < n) {
+          if (d + cOne <= k) {
+            if (val < dp[i + cOne][j][d + cOne]) {
+              dp[i + cOne][j][d + cOne] = val;
+            }
+          }
+        }
+        if (j < m) {
+          if (d + cOne <= k) {
+            if (val < dp[i][j + cOne][d + cOne]) {
+              dp[i][j + cOne][d + cOne] = val;
+            }
+          }
+        }
+        if (i < n) {
+          if (j < m) {
+            if (d + cOne <= k) {
+              if (val < dp[i + cOne][j + cOne][d + cOne]) {
+                dp[i + cOne][j + cOne][d + cOne] = val;
+              }
+            }
+            int cost = cOne;
+            if (v[i] == u[j]) {
+              cost = cZero;
+            }
+            if (val + cost < dp[i + cOne][j + cOne][d]) {
+              dp[i + cOne][j + cOne][d] = val + cost;
+            }
+          }
+        }
+      }
+    }
+  }
+  int ans = cInf;
+  for (int d = cZero; d <= k; d++) {
+    if (dp[n][m][d] < ans) {
+      ans = dp[n][m][d];
+    }
+  }
+  if (ans == cInf) {
+    std::cout << cMinusOne << '\n';
+  }
+  else {
+    std::cout << ans << '\n';
+  }
+  return cZero;
 }
