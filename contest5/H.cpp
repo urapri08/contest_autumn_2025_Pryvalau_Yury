@@ -1,44 +1,37 @@
-﻿#include <iostream>
-const int cZero = 0;
-const int cOne = 1;
-const int cTwo = 2;
-const int cMaxN = 2005;
-unsigned long long global_dp[cMaxN];
+﻿#include <cstdint>
+#include <iostream>
+#include <vector>
 void Solve() {
-  int n;
+  int n = 0;
   std::cin >> n;
-  unsigned long long total_ways;
-  total_ways = cZero;
-  for (int x = cOne; x <= n; x++) {
-    int target;
-    target = n - x;
-    if (target == cZero) {
-      total_ways = total_ways + cOne;
+  uint64_t total_ways = 0;
+  std::vector<uint64_t> dp(n + 1, 0);
+  for (int x = 1; x <= n; x++) {
+    int target = n - x;
+    if (target == 0) {
+      total_ways++;
     }
-    if (target > cZero) {
-      for (int i = cZero; i <= target; i++) {
-        global_dp[i] = cZero;
+    if (target > 0) {
+      for (int i = 0; i <= target; i++) {
+        dp[i] = 0;
       }
-      global_dp[cZero] = cOne;
-      int max_val;
-      max_val = x * cTwo - cOne;
-      for (int v = x + cOne; v <= max_val; v++) {
+      dp[0] = 1;
+      int max_val = x * 2 - 1;
+      for (int v = x + 1; v <= max_val; v++) {
         for (int j = target; j >= v; j--) {
-          unsigned long long ways;
-          ways = global_dp[j - v];
-          global_dp[j] = global_dp[j] + ways;
+          uint64_t ways = dp[j - v];
+          dp[j] = dp[j] + ways;
         }
       }
-      unsigned long long add_ways;
-      add_ways = global_dp[target];
+      uint64_t add_ways = dp[target];
       total_ways = total_ways + add_ways;
     }
   }
-  std::cout << total_ways << "\n";
+  std::cout << total_ways << '\n';
 }
 int main() {
   std::ios::sync_with_stdio(false);
   std::cin.tie(nullptr);
   Solve();
-  return cZero;
+  return 0;
 }
