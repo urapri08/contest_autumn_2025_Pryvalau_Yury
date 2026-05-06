@@ -1,10 +1,15 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
+
+const int cNoEdge = 100000;
+
 struct Edge {
   int u;
   int v;
   int cost;
 };
+
 struct State {
   std::vector<Edge> edges;
   std::vector<long long> dist;
@@ -12,31 +17,24 @@ struct State {
   int n;
   int cycle_start;
 };
+
 void RunBellmanFord(State& st) {
   st.dist.assign(st.n + 1, 0);
   st.parent.assign(st.n + 1, -1);
   st.cycle_start = -1;
-  int iter = 1;
-  while (iter <= st.n) {
+
+  for (int iter = 1; iter <= st.n; ++iter) {
     st.cycle_start = -1;
-    int edge_index = 0;
-    int edge_count = st.edges.size();
-    while (edge_index < edge_count) {
-      int u_node = st.edges[edge_index].u;
-      int v_node = st.edges[edge_index].v;
-      int edge_cost = st.edges[edge_index].cost;
-      long long new_dist = st.dist[u_node];
-      new_dist += edge_cost;
-      if (new_dist < st.dist[v_node]) {
-        st.dist[v_node] = new_dist;
-        st.parent[v_node] = u_node;
-        st.cycle_start = v_node;
+    for (const auto& edge : st.edges) {
+      if (st.dist[edge.u] + edge.cost < st.dist[edge.v]) {
+        st.dist[edge.v] = st.dist[edge.u] + edge.cost;
+        st.parent[edge.v] = edge.u;
+        st.cycle_start = edge.v;
       }
-      edge_index++;
     }
-    iter++;
   }
 }
+
 void PrintResult(State& st) {
   if (st.cycle_start == -1) {
     std::cout << "NO\n";
@@ -44,11 +42,10 @@ void PrintResult(State& st) {
   else {
     std::cout << "YES\n";
     int curr = st.cycle_start;
-    int step = 1;
-    while (step <= st.n) {
+    for (int step = 1; step <= st.n; ++step) {
       curr = st.parent[curr];
-      step++;
     }
+
     std::vector<int> cycle;
     int start_node = curr;
     cycle.push_back(start_node);
@@ -58,52 +55,39 @@ void PrintResult(State& st) {
       curr = st.parent[curr];
     }
     cycle.push_back(start_node);
-    int left = 0;
-    int right = cycle.size();
-    right--;
-    while (left < right) {
-      int temp = cycle[left];
-      cycle[left] = cycle[right];
-      cycle[right] = temp;
-      left++;
-      right--;
-    }
+    std::reverse(cycle.begin(), cycle.end());
+
     std::cout << cycle.size() << "\n";
-    int print_index = 0;
-    int cycle_size = cycle.size();
-    while (print_index < cycle_size) {
-      std::cout << cycle[print_index];
-      std::cout << " ";
-      print_index++;
+    for (int i = 0; i < static_cast<int>(cycle.size()); ++i) {
+      std::cout << cycle[i] << (i == static_cast<int>(cycle.size()) - 1 ? "" : " ");
     }
     std::cout << "\n";
   }
 }
+
 int main() {
   std::ios::sync_with_stdio(false);
   std::cin.tie(nullptr);
+
+  int n = 0;
+  if (!(std::cin >> n)) {
+    return 0;
+  }
+
   State st;
-  st.n = 0;
-  std::cin >> st.n;
-  const int cNoEdge = 100000;
-  int row = 1;
-  while (row <= st.n) {
-    int col = 1;
-    while (col <= st.n) {
+  st.n = n;
+  for (int row = 1; row <= st.n; ++row) {
+    for (int col = 1; col <= st.n; ++col) {
       int weight = 0;
       std::cin >> weight;
       if (weight != cNoEdge) {
-        Edge edge;
-        edge.u = row;
-        edge.v = col;
-        edge.cost = weight;
-        st.edges.push_back(edge);
+        st.edges.push_back({ row, col, weight });
       }
-      col++;
     }
-    row++;
   }
+
   RunBellmanFord(st);
   PrintResult(st);
+
   return 0;
 }
