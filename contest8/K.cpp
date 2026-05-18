@@ -2,14 +2,17 @@
 #include <iostream>
 #include <queue>
 #include <vector>
-const long long cInf = 1000000000000000000LL;
+
+const long long cInf = 1'000'000'000'000'000'000LL;
+
 struct Edge {
-  int to;
   long long cap;
   long long flow;
   long long cost;
+  int to;
   int rev;
 };
+
 struct Graph {
   std::vector<std::vector<Edge>> adj;
   std::vector<long long> dist;
@@ -17,11 +20,15 @@ struct Graph {
   std::vector<int> parent_edge;
   std::vector<long long> pot;
   int n;
+
+  Graph(int nodes) : adj(nodes + 1), n(nodes) {}
 };
+
 void AddEdge(int u, int v, long long cap, long long cost, Graph& g) {
-  g.adj[u].push_back({ v, cap, 0, cost, static_cast<int>(g.adj[v].size()) });
-  g.adj[v].push_back({ u, 0, 0, -cost, static_cast<int>(g.adj[u].size()) - 1 });
+  g.adj[u].push_back({ cap, 0, cost, v, static_cast<int>(g.adj[v].size()) });
+  g.adj[v].push_back({ 0, 0, -cost, u, static_cast<int>(g.adj[u].size()) - 1 });
 }
+
 bool RunDijkstra(int source, int sink, Graph& g) {
   g.dist.assign(g.n + 1, cInf);
   g.parent_edge.assign(g.n + 1, -1);
@@ -54,6 +61,7 @@ bool RunDijkstra(int source, int sink, Graph& g) {
   }
   return g.dist[sink] != cInf;
 }
+
 long long MinCostMaxFlow(int source, int sink, Graph& g) {
   long long min_cost = 0;
   g.pot.assign(g.n + 1, 0);
@@ -84,15 +92,14 @@ long long MinCostMaxFlow(int source, int sink, Graph& g) {
   }
   return min_cost;
 }
+
 void SolveTask() {
   int n = 0;
   int m = 0;
   if (!(std::cin >> n >> m)) {
     return;
   }
-  Graph g;
-  g.n = n;
-  g.adj.resize(n + 1);
+  Graph g(n);
   for (int i = 0; i < m; ++i) {
     int u = 0;
     int v = 0;
@@ -104,6 +111,7 @@ void SolveTask() {
   long long total_cost = MinCostMaxFlow(1, n, g);
   std::cout << total_cost << "\n";
 }
+
 int main() {
   std::ios::sync_with_stdio(false);
   std::cin.tie(nullptr);
